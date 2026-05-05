@@ -1,6 +1,7 @@
-package ru.runa.gpd.extension;
+package ru.runa.gpd.extension.handler;
 
 import org.eclipse.jface.window.Window;
+import ru.runa.gpd.extension.DelegableProvider;
 import ru.runa.gpd.lang.model.Delegable;
 import ru.runa.gpd.lang.model.GraphElement;
 import ru.runa.gpd.lang.model.ProcessDefinition;

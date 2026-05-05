@@ -2234,14 +2234,14 @@
             label="%label.element.businessRule">
       </handler>
 		 <handler
-				 actionHandler="false"
+				 actionHandler="true"
 				 assignmentHandler="false"
 				 botTaskHandler="false"
-				 cellEditorProvider="ru.runa.gpd.extension.ConditionalExpressionProvider"
-				 className="ru.runa.wfe.extension.handler.var.ConditionalExpressionHandler"
+				 cellEditorProvider="ru.runa.gpd.extension.handler.ConditionalExpressionProvider"
+				 className="ru.runa.wfe.extension.handler.ConditionalExpressionHandler"
 				 decisionHandler="false"
 				 enabled="false"
-				 label="%label.element.businessRule">
+				 label="%ru.runa.wfe.extension.handler.ConditionalExpressionHandler">
 		 </handler>
       <handler
             actionHandler="true"

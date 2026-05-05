@@ -75,7 +75,7 @@
             enabled="false">
       </handler>
 			<handler
-					actionHandler="false"
+					actionHandler="true"
 					assignmentHandler="false"
 					botTaskHandler="false"
 					decisionHandler="false"

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
+import ru.runa.gpd.extension.HandlerArtifact;
 import ru.runa.gpd.lang.ValidationError;
 import ru.runa.gpd.lang.model.Delegable;
 import ru.runa.gpd.lang.model.GraphElement;
@@ -18,7 +19,7 @@ import ru.runa.gpd.property.DelegableClassPropertyDescriptor;
 public class CatchEventNode extends AbstractEventNode implements IReceiveMessageNode, IBoundaryEventCapable, IBoundaryEventContainer, ConnectableViaDottedTransition, StorageAware, Delegable {
 
     private static final String INTERNAL_STORAGE_DELEGATION_CLASS_NAME = "ru.runa.wfe.office.storage.handler.ConditionalInternalStorageHandler";
-    private static final String CONDITIONAL_EXPRESSION_DELEGATION_CLASS_NAME = "ru.runa.wfe.extension.handler.var.ConditionalExpressionHandler";
+    private static final String CONDITIONAL_EXPRESSION_DELEGATION_CLASS_NAME = "ru.runa.wfe.extension.handler.ConditionalExpressionHandler";
 
     public static boolean isBoundaryEventInParent(GraphElement parent) {
         return parent instanceof IBoundaryEventContainer && !(parent.getParent() instanceof IBoundaryEventContainer);
@@ -104,7 +105,7 @@ public class CatchEventNode extends AbstractEventNode implements IReceiveMessage
 
     @Override
     public void validateOnEmptyRules(List<ValidationError> errors) {
-        if (getEventNodeType() == EventNodeType.error && getParent() instanceof IBoundaryEventContainer) {
+        if (isConditional() || (getEventNodeType() == EventNodeType.error && getParent() instanceof IBoundaryEventContainer)) {
             return;
         }
         super.validateOnEmptyRules(errors);
@@ -137,19 +138,8 @@ public class CatchEventNode extends AbstractEventNode implements IReceiveMessage
         if (isBoundaryEvent() && getArrivingTransitions().size() > 0) {
             errors.add(ValidationError.createLocalizedError(this, "unresolvedArrivingTransition"));
         }
-        if (isConditional()) {
-            String handler = getDelegationClassName();
-            String config = getDelegationConfiguration();
-            if (handler == null || handler.trim().isEmpty()) {
-                errors.add(ValidationError.createLocalizedError(this, "delegationClassName.empty"));
-            }
-            if (config == null || config.trim().isEmpty()) {
-                errors.add(ValidationError.createLocalizedError(this, "delegable.invalidConfiguration.empty"));
-            }
-        } else {
-            if (isUseExternalStorageIn()) {
-                errors.add(ValidationError.createLocalizedError(this, "catchEvent.mustBeConditionalWhenConnectedToStorage"));
-            }
+        if (!isConditional() && isUseExternalStorageIn()) {
+            errors.add(ValidationError.createLocalizedError(this, "catchEvent.mustBeConditionalWhenConnectedToStorage"));
         }
     }
 
@@ -164,7 +154,7 @@ public class CatchEventNode extends AbstractEventNode implements IReceiveMessage
 
     @Override
     public String getDelegationType() {
-        return null;
+        return HandlerArtifact.ACTION;
     }
 
     @Override
