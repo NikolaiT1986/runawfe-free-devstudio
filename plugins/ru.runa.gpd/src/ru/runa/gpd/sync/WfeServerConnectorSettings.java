@@ -53,7 +53,7 @@ public class WfeServerConnectorSettings implements PrefConstants {
             this.allowUpdateLastVersionByKeyBinding = Activator
                     .getPrefBoolean(prefix + '.' + P_WFE_SERVER_CONNECTOR_ALLOW_UPDATE_LAST_VERSION_BY_KEY_BINDING_SUFFIX);
         } else {
-            this.protocol = "http";
+            this.protocol = System.getProperty("wfe.default.protocol", "http");
             this.allowSslInsecure = false;
             this.host = System.getProperty("wfe.default.host", "localhost");
             String portStr = System.getProperty("wfe.default.port", "8080");

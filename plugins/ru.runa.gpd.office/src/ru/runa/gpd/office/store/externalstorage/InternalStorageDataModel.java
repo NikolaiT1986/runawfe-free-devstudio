@@ -82,6 +82,16 @@ public class InternalStorageDataModel extends DataModel {
             if (!errors.isEmpty()) {
                 return;
             }
+            if (constraintsModel.getQueryType() == QueryType.UPDATE) {
+                final String variableName = constraintsModel.getVariableName();
+                final Optional<Variable> selected = graphElement.getProcessDefinition().getVariables(true, false).stream()
+                        .filter(variable -> Objects.equal(variableName, variable.getName())).findAny();
+                if (selected.isPresent() && !selected.get().isComplex()) {
+                    errors.add(ValidationError.createError(graphElement,
+                            MessageFormat.format(Messages.getString("model.validation.storage.update.listVariable"), variableName)));
+                    return;
+                }
+            }
         } else {
             inOutModel.validate(graphElement, mode, errors);
         }
