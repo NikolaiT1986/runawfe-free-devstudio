@@ -24,19 +24,12 @@ public final class MessageNodeFeatureResolver {
 
     public static ChangePropertyFeature<?, ?> resolveFeature(MessageNode messageNode) {
         if (messageNode instanceof CatchEventNode && ((CatchEventNode) messageNode).isConditional()) {
-            return resolveConditionalEventFeature((CatchEventNode) messageNode);
+            return createConditionalDelegableConfigurationFeature((CatchEventNode) messageNode);
         }
-        return createRegularMessageNodeFeature(messageNode);
+        return createMessageNodeChangeVariableMappingsFeature(messageNode);
     }
 
-    private static ChangePropertyFeature<?, ?> resolveConditionalEventFeature(CatchEventNode node) {
-        if (node.isUseExternalStorageIn()) {
-            return createExternalStorageConfigurationFeature(node);
-        }
-        return createConditionalExpressionConfigurationFeature(node);
-    }
-
-    private static ChangePropertyFeature<?, ?> createExternalStorageConfigurationFeature(CatchEventNode catchEventNode) {
+    private static ChangePropertyFeature<?, ?> createConditionalDelegableConfigurationFeature(CatchEventNode catchEventNode) {
         String oldValue = catchEventNode.getDelegationConfiguration();
         String newValue = DialogEnhancement.showConfigurationDialog(catchEventNode);
         if (newValue != null && !newValue.equals(oldValue)) {
@@ -45,19 +38,7 @@ public final class MessageNodeFeatureResolver {
         return null;
     }
 
-    private static ChangePropertyFeature<?, ?> createConditionalExpressionConfigurationFeature(CatchEventNode catchEventNode) {
-        ConditionalExpressionDialog dialog = new ConditionalExpressionDialog(catchEventNode);
-        if (dialog.open() == Window.OK) {
-            String oldValue = catchEventNode.getDelegationConfiguration();
-            String newValue = dialog.getResult();
-            if (!Objects.equal(newValue, oldValue)) {
-                return new ChangeDelegationConfigurationFeature(catchEventNode, oldValue, newValue);
-            }
-        }
-        return null;
-    }
-
-    private static ChangePropertyFeature<?, ?> createRegularMessageNodeFeature(MessageNode messageNode) {
+    private static ChangePropertyFeature<?, ?> createMessageNodeChangeVariableMappingsFeature(MessageNode messageNode) {
         List<VariableMapping> oldMappings = messageNode.getVariableMappings();
         MessageNodeDialog dialog = new MessageNodeDialog(
                 messageNode.getProcessDefinition(),

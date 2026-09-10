@@ -46,7 +46,7 @@ public class AbstractEventNode extends MessageNode {
     public void setPropertyValue(Object id, Object value) {
         if (PROPERTY_EVENT_TYPE.equals(id)) {
             int index = ((Integer) value).intValue();
-             UndoRedoUtil.executeFeature(new ChangeEventTypeFeature(this,EventNodeType.values()[index]));
+            UndoRedoUtil.executeFeature(new ChangeEventTypeFeature(this, EventNodeType.values()[index]));
         } else {
             super.setPropertyValue(id, value);
         }

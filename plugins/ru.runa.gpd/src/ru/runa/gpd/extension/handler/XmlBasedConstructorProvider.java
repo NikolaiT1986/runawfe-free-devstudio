@@ -256,7 +256,7 @@ public abstract class XmlBasedConstructorProvider<T extends Observable> extends 
             }
         }
 
-        private void populateToConstructorView() {
+        protected void populateToConstructorView() {
             try {
                 String xml = xmlContentView.getValue();
                 if (constructorView instanceof Observer && model != null) {

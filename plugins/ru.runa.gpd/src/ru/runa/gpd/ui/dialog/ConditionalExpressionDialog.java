@@ -9,16 +9,11 @@ import ru.runa.gpd.extension.businessRule.BusinessRuleEditorDialog;
 import ru.runa.gpd.extension.businessRule.BusinessRuleModel;
 import ru.runa.gpd.lang.model.ConditionalEventModel;
 import ru.runa.gpd.lang.model.ProcessDefinition;
-import ru.runa.gpd.lang.model.bpmn.CatchEventNode;
 import ru.runa.gpd.ui.control.IntervalControl;
 
 public class ConditionalExpressionDialog extends BusinessRuleEditorDialog {
 
     private final ConditionalEventModel conditionalEventModel;
-
-    public ConditionalExpressionDialog(CatchEventNode node) {
-        this(node.getProcessDefinition(), ConditionalEventModel.fromXml(node.getDelegationConfiguration()));
-    }
 
     public ConditionalExpressionDialog(ProcessDefinition definition, String configuration) {
         this(definition, ConditionalEventModel.fromXml(configuration));

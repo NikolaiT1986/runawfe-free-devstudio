@@ -3,10 +3,10 @@ package ru.runa.gpd.lang.model;
 import com.google.common.base.Strings;
 import org.dom4j.Document;
 import org.dom4j.Element;
+import org.dom4j.io.OutputFormat;
 import ru.runa.gpd.lang.model.bpmn.CatchEventNode;
 import ru.runa.gpd.util.Duration;
 import ru.runa.gpd.util.XmlUtil;
-import ru.runa.wfe.commons.xml.XmlUtils;
 
 /**
  * Configuration model for conditional {@link CatchEventNode}.
@@ -36,13 +36,13 @@ public class ConditionalEventModel {
             return model;
         }
 
-        Document doc = XmlUtils.parseWithoutValidation(xml);
+        Document doc = XmlUtil.parseWithoutValidation(xml);
         Element root = doc.getRootElement();
 
         model.expression = Strings.nullToEmpty(root.elementText(EXPRESSION));
 
         Element storage = root.element(STORAGE);
-        if (storage != null && !storage.elements().isEmpty()) {
+        if (storage != null) {
             model.storage = storage;
         }
 
@@ -76,7 +76,8 @@ public class ConditionalEventModel {
             hasData = true;
         }
 
-        return hasData ? XmlUtil.toString(doc) : "";
+        // formatting the entire document to fix the InternalStorageDataModel format
+        return hasData ? XmlUtil.toString(doc, createOutputFormat()) : "";
     }
 
     public String getExpression() {
@@ -88,14 +89,7 @@ public class ConditionalEventModel {
     }
 
     public Element getStorage() {
-        if (storage == null) {
-            return null;
-        }
-        return storage.createCopy();
-    }
-
-    public Element getStorageUnsafe() {
-        return storage;
+        return storage == null ? null : storage.createCopy();
     }
 
     public void setStorage(Element storage) {
@@ -115,5 +109,14 @@ public class ConditionalEventModel {
 
     public void setInterval(Duration interval) {
         this.interval = interval;
+    }
+
+    public static OutputFormat createOutputFormat() {
+        OutputFormat format = new OutputFormat();
+        format.setIndentSize(2);
+        format.setNewlines(true);
+        format.setTrimText(true);
+        format.setPadText(false);
+        return format;
     }
 }

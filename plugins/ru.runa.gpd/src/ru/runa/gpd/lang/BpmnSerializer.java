@@ -1046,9 +1046,6 @@ public class BpmnSerializer extends ProcessSerializer {
             transition.setName(transitionElement.attributeValue(NAME));
             transition.setTarget(target);
             ((ConnectableViaDottedTransition) source).addLeavingDottedTransition(transition);
-            if (target instanceof ConnectableViaDottedTransition) {
-                ((ConnectableViaDottedTransition) target).addArrivingDottedTransition(transition);
-            }
         }
         definition.onLoadingCompleted();
     }

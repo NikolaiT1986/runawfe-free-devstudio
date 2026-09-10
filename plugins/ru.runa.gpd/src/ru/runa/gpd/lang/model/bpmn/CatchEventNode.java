@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import ru.runa.gpd.extension.HandlerArtifact;
 import ru.runa.gpd.lang.ValidationError;
 import ru.runa.gpd.lang.model.Delegable;
@@ -14,12 +13,11 @@ import ru.runa.gpd.lang.model.Node;
 import ru.runa.gpd.lang.model.StorageAware;
 import ru.runa.gpd.lang.model.Timer;
 import ru.runa.gpd.lang.model.Transition;
-import ru.runa.gpd.property.DelegableClassPropertyDescriptor;
 
 public class CatchEventNode extends AbstractEventNode implements IReceiveMessageNode, IBoundaryEventCapable, IBoundaryEventContainer, ConnectableViaDottedTransition, StorageAware, Delegable {
 
-    private static final String INTERNAL_STORAGE_DELEGATION_CLASS_NAME = "ru.runa.wfe.office.storage.handler.ConditionalInternalStorageHandler";
-    private static final String CONDITIONAL_EXPRESSION_DELEGATION_CLASS_NAME = "ru.runa.wfe.extension.handler.ConditionalExpressionHandler";
+    public static final String CONDITIONAL_EXPRESSION_HANDLER = "ru.runa.wfe.extension.handler.var.ConditionalExpressionHandler";
+    public static final String CONDITIONAL_INTERNAL_STORAGE_HANDLER = "ru.runa.wfe.office.storage.handler.ConditionalInternalStorageHandler";
 
     public static boolean isBoundaryEventInParent(GraphElement parent) {
         return parent instanceof IBoundaryEventContainer && !(parent.getParent() instanceof IBoundaryEventContainer);
@@ -52,12 +50,16 @@ public class CatchEventNode extends AbstractEventNode implements IReceiveMessage
             setEventNodeType(EventNodeType.conditional);
         }
         transition.setTarget(this);
-        setDelegationClassName(INTERNAL_STORAGE_DELEGATION_CLASS_NAME);
+        setDelegationClassName(CONDITIONAL_INTERNAL_STORAGE_HANDLER);
     }
 
     @Override
     public void removeArrivingDottedTransition(DottedTransition transition) {
-        setDelegationClassName(null);
+        if (isConditional()) {
+            setDelegationClassName(CONDITIONAL_EXPRESSION_HANDLER);
+        } else {
+            setDelegationClassName(null);
+        }
     }
 
     @Override
@@ -82,20 +84,6 @@ public class CatchEventNode extends AbstractEventNode implements IReceiveMessage
                 .flatMap(n -> ((ConnectableViaDottedTransition) n).getLeavingDottedTransitions().stream())
                 .filter(t -> t.getTarget() != null && t.getTarget().equals(this))
                 .collect(Collectors.toList());
-    }
-
-    @Override
-    public void setEventNodeType(EventNodeType eventNodeType) {
-        if (isUseExternalStorageIn() && eventNodeType != EventNodeType.conditional) {
-            return;
-        }
-        if (!isUseExternalStorageIn() && eventNodeType == EventNodeType.conditional) {
-            setDelegationClassName(CONDITIONAL_EXPRESSION_DELEGATION_CLASS_NAME);
-        }
-        if (eventNodeType != EventNodeType.conditional) {
-            setDelegationClassName(null);
-        }
-        super.setEventNodeType(eventNodeType);
     }
 
     @Override
@@ -144,15 +132,6 @@ public class CatchEventNode extends AbstractEventNode implements IReceiveMessage
     }
 
     @Override
-    public void populateCustomPropertyDescriptors(List<IPropertyDescriptor> descriptors) {
-        super.populateCustomPropertyDescriptors(descriptors);
-
-        if (isConditional()) {
-            descriptors.removeIf(d -> d instanceof DelegableClassPropertyDescriptor);
-        }
-    }
-
-    @Override
     public String getDelegationType() {
         return HandlerArtifact.ACTION;
     }
@@ -164,10 +143,8 @@ public class CatchEventNode extends AbstractEventNode implements IReceiveMessage
 
     @Override
     public boolean testAttribute(Object target, String name, String value) {
-        if ("delegableEditHandler".equals(name)) {
-            return false;
-        }
-        if ("delegableEditConfiguration".equals(name)) {
+        if ("delegableEditHandler".equals(name)
+                || "delegableEditConfiguration".equals(name)) {
             return false;
         }
         return super.testAttribute(target, name, value);

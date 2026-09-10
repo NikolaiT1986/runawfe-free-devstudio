@@ -14,7 +14,7 @@ import ru.runa.gpd.util.Duration;
 
 public class IntervalControl {
 
-    private static final String DEFAULT_VALUE = "5 minutes";
+    public static final String DEFAULT_VALUE = "5 minutes";
 
     private final Consumer<Duration> onChange;
 

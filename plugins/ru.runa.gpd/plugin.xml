@@ -2237,11 +2237,11 @@
 				 actionHandler="true"
 				 assignmentHandler="false"
 				 botTaskHandler="false"
-				 cellEditorProvider="ru.runa.gpd.extension.handler.ConditionalExpressionProvider"
-				 className="ru.runa.wfe.extension.handler.ConditionalExpressionHandler"
+				 cellEditorProvider="ru.runa.gpd.extension.handler.ConditionalEventExpressionProvider"
+				 className="ru.runa.wfe.extension.handler.var.ConditionalExpressionHandler"
 				 decisionHandler="false"
 				 enabled="false"
-				 label="%ru.runa.wfe.extension.handler.ConditionalExpressionHandler">
+				 label="%ru.runa.wfe.extension.handler.var.ConditionalExpressionHandler">
 		 </handler>
       <handler
             actionHandler="true"

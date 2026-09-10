@@ -43,9 +43,12 @@ public class ChangeEventTypeFeature extends ChangePropertyFeature<AbstractEventN
     }
 
     private void handleArrivingDottedTransitionsDeleted(CatchEventNode node) {
-        if (node.isUseExternalStorageIn() && newValue != EventNodeType.conditional) {
+        boolean useExternalStorageIn = node.isUseExternalStorageIn();
+        if (useExternalStorageIn && newValue != EventNodeType.conditional) {
             dottedTransitions = node.getArrivingDottedTransitions();
             dottedTransitions.forEach(this::deleteDottedConnection);
+        } else {
+            handleDelegationConfigByType(newValue);
         }
     }
 
@@ -72,6 +75,16 @@ public class ChangeEventTypeFeature extends ChangePropertyFeature<AbstractEventN
                 source.addLeavingDottedTransition(transition);
                 ((ConnectableViaDottedTransition) target).addArrivingDottedTransition(transition);
             }
+        } else {
+            handleDelegationConfigByType(EventNodeType.conditional);
+        }
+    }
+
+    private void handleDelegationConfigByType(EventNodeType type) {
+        if (type == EventNodeType.conditional) {
+            target.setDelegationClassName(CatchEventNode.CONDITIONAL_EXPRESSION_HANDLER);
+        } else {
+            target.setDelegationClassName(null);
         }
     }
 

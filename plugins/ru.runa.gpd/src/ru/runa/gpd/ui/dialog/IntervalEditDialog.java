@@ -16,6 +16,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import ru.runa.gpd.Localization;
+import ru.runa.gpd.ui.control.IntervalControl;
 import ru.runa.gpd.util.Duration;
 import ru.runa.gpd.util.Duration.Unit;
 
@@ -134,14 +135,14 @@ public class IntervalEditDialog extends Dialog {
     @Override
     protected void createButtonsForButtonBar(Composite parent) {
 
-        Button clearButton = createButton(parent, CLEAR_ID, Localization.getString("button.clear"), false);
+        Button clearButton = createButton(parent, CLEAR_ID, Localization.getString("button.default"), false);
 
         super.createButtonsForButtonBar(parent);
 
         clearButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                editable = new Duration();
+                editable = new Duration(IntervalControl.DEFAULT_VALUE);
                 updateGUI();
             }
         });

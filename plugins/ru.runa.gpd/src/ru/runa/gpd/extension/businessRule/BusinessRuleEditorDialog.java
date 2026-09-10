@@ -678,18 +678,16 @@ public class BusinessRuleEditorDialog extends EditorDialog<BusinessRuleModel> {
             Button button = new Button(this, SWT.NONE);
             button.setLayoutData(getVariableGridData());
             button.setText(Localization.getString("GroovyEditor.functionButton") + lineIndex);
-
             button.addSelectionListener(new LoggingSelectionAdapter() {
                 @Override
                 protected void onSelection(SelectionEvent e) throws Exception {
                     FormulaCellEditorProvider.ConfigurationDialog dialog =
-                            new FormulaCellEditorProvider.ConfigurationDialog(button.getText(), variableNames);
+                            new FormulaCellEditorProvider.ConfigurationDialog(functionButton.getText(), variableNames);
                     if (dialog.open() == Window.OK) {
                         button.setText(dialog.getResult());
                     }
                 }
             });
-
             return button;
         }
 
