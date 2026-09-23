@@ -150,13 +150,13 @@ public class InternalStorageOperationHandlerCellEditorProvider extends XmlBasedC
     }
 
     protected class ConstructorView extends ConstructorComposite {
-        private final VariableProvider variableProvider;
+        protected final VariableProvider variableProvider;
 
         private final boolean isUseExternalStorageIn;
         private final boolean isUseExternalStorageOut;
 
         protected StorageConstraintsModel constraintsModel;
-        private VariableUserTypeInfo variableUserTypeInfo = new VariableUserTypeInfo(false, "");
+        protected VariableUserTypeInfo variableUserTypeInfo = new VariableUserTypeInfo(false, "");
 
         protected ConstraintsCompositeBuilder constraintsCompositeBuilder;
 

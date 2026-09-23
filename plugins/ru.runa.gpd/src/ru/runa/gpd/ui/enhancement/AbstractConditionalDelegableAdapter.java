@@ -5,23 +5,27 @@ import ru.runa.gpd.lang.model.ConditionalEventModel;
 import ru.runa.gpd.lang.model.Delegable;
 import ru.runa.gpd.lang.model.GraphElement;
 import ru.runa.gpd.lang.model.GraphElementAware;
+import ru.runa.gpd.lang.model.Node;
 import ru.runa.gpd.lang.model.ProcessDefinition;
 import ru.runa.gpd.lang.model.ProcessDefinitionAware;
 import ru.runa.gpd.lang.model.Variable;
 import ru.runa.gpd.lang.model.VariableContainer;
-import ru.runa.gpd.lang.model.bpmn.CatchEventNode;
 
-public abstract class AbstractConditionalEventDelegableAdapter implements Delegable, GraphElementAware, ProcessDefinitionAware, VariableContainer {
+/**
+ * Abstract delegable adapter for conditional event nodes that uses
+ * {@link ConditionalEventModel} to manage the event configuration.
+ */
+public abstract class AbstractConditionalDelegableAdapter<N extends Node> implements Delegable, GraphElementAware, ProcessDefinitionAware, VariableContainer {
 
-    protected final CatchEventNode node;
+    protected final N node;
     protected final ConditionalEventModel model;
 
-    public AbstractConditionalEventDelegableAdapter(CatchEventNode node) {
+    public AbstractConditionalDelegableAdapter(N node) {
         this.node = node;
         this.model = ConditionalEventModel.fromXml(node.getDelegationConfiguration());
     }
 
-    public AbstractConditionalEventDelegableAdapter(CatchEventNode node, ConditionalEventModel model) {
+    public AbstractConditionalDelegableAdapter(N node, ConditionalEventModel model) {
         this.node = node;
         this.model = model;
     }
@@ -43,9 +47,7 @@ public abstract class AbstractConditionalEventDelegableAdapter implements Delega
     }
 
     @Override
-    public String getDelegationType() {
-        return node.getDelegationType();
-    }
+    public abstract String getDelegationType();
 
     @Override
     public ProcessDefinition getProcessDefinition() {
@@ -56,6 +58,7 @@ public abstract class AbstractConditionalEventDelegableAdapter implements Delega
     public List<Variable> getVariables(boolean expandComplexTypes, boolean includeSwimlanes, String... typeClassNameFilters) {
         return node.getVariables(expandComplexTypes, includeSwimlanes, typeClassNameFilters);
     }
+
     @Override
     public List<String> getVariableNames(boolean includeSwimlanes, String... typeClassNameFilters) {
         return node.getVariableNames(includeSwimlanes, typeClassNameFilters);
@@ -66,7 +69,7 @@ public abstract class AbstractConditionalEventDelegableAdapter implements Delega
         return node;
     }
 
-    public CatchEventNode getNode() {
+    public Node getNode() {
         return node;
     }
 

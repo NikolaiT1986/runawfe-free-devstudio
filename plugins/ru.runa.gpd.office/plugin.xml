@@ -84,6 +84,16 @@
 					label="%ru.runa.wfe.office.storage.handler.ConditionalInternalStorageHandler"
 					enabled="false">
 			</handler>
+			<handler
+					actionHandler="true"
+					assignmentHandler="false"
+					botTaskHandler="false"
+					decisionHandler="false"
+					cellEditorProvider="ru.runa.gpd.office.store.StartInternalStorageOperationHandlerCellEditorProvider"
+					className="ru.runa.wfe.office.storage.handler.StartInternalStorageHandler"
+					label="%ru.runa.wfe.office.storage.handler.StartInternalStorageHandler"
+					enabled="false">
+			</handler>
    </extension>
 
 </plugin>

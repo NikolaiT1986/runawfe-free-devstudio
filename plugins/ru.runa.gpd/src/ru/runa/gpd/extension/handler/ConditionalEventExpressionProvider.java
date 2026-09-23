@@ -7,11 +7,11 @@ import ru.runa.gpd.lang.ValidationError;
 import ru.runa.gpd.lang.model.Delegable;
 import ru.runa.gpd.lang.model.ProcessDefinition;
 import ru.runa.gpd.lang.model.ProcessDefinitionAware;
-import ru.runa.gpd.lang.model.bpmn.CatchEventNode;
 import ru.runa.gpd.ltk.ConditionalEventDelegablePresentation;
 import ru.runa.gpd.ui.dialog.ConditionalExpressionDialog;
-import ru.runa.gpd.ui.enhancement.ConditionalEventExpressionDelegableAdapter;
 import ru.runa.gpd.ui.enhancement.DialogEnhancementMode;
+
+import static ru.runa.gpd.ui.enhancement.ConditionalEventDelegableAdapters.adaptToExpression;
 
 /**
  * Provider for conditional event expressions configuration.
@@ -34,10 +34,7 @@ public class ConditionalEventExpressionProvider extends GroovyBasedProvider {
 
     @Override
     public boolean validateValue(Delegable delegable, List<ValidationError> errors) {
-        return super.validateValue(adapt(delegable), errors);
+        return super.validateValue(adaptToExpression(delegable), errors);
     }
 
-    private ConditionalEventExpressionDelegableAdapter adapt(Delegable delegable) {
-        return new ConditionalEventExpressionDelegableAdapter((CatchEventNode) delegable);
-    }
 }

@@ -24,6 +24,7 @@ import ru.runa.gpd.lang.model.FormNode;
 import ru.runa.gpd.lang.model.GraphElement;
 import ru.runa.gpd.lang.model.MultiTaskState;
 import ru.runa.gpd.lang.model.ProcessDefinition;
+import ru.runa.gpd.lang.model.StartState;
 import ru.runa.gpd.lang.model.Subprocess;
 import ru.runa.gpd.lang.model.SubprocessDefinition;
 import ru.runa.gpd.lang.model.Swimlane;
@@ -86,6 +87,10 @@ public class RenameVariableRefactoring extends Refactoring {
         List<FormNode> formNodes = processDefinition.getChildren(FormNode.class);
         for (FormNode formNode : formNodes) {
             cache.add(new FormNodePresentation(definitionFolder, formNode));
+        }
+        List<StartState> startStates = processDefinition.getChildren(StartState.class);
+        for (StartState startState : startStates) {
+            cache.add(new ConditionalEventDelegablePresentation(startState));
         }
         List<TaskState> stateNodes = processDefinition.getChildren(TaskState.class);
         for (TaskState taskState : stateNodes) {

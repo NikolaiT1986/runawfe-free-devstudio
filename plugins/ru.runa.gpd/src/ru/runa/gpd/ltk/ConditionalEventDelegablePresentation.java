@@ -12,23 +12,22 @@ import ru.runa.gpd.extension.HandlerRegistry;
 import ru.runa.gpd.lang.model.ConditionalEventModel;
 import ru.runa.gpd.lang.model.Delegable;
 import ru.runa.gpd.lang.model.Variable;
-import ru.runa.gpd.lang.model.bpmn.CatchEventNode;
-import ru.runa.gpd.ui.enhancement.ConditionalEventExpressionDelegableAdapter;
-import ru.runa.gpd.ui.enhancement.ConditionalEventStorageDelegableAdapter;
 import ru.runa.gpd.util.XmlUtil;
+
+import static ru.runa.gpd.ui.enhancement.ConditionalEventDelegableAdapters.adaptToExpression;
+import static ru.runa.gpd.ui.enhancement.ConditionalEventDelegableAdapters.adaptToStorage;
 
 /**
  * Refactoring and variable rename support for conditional event configuration.
- * Currently used for conditional {@link CatchEventNode}s.
  */
-public class ConditionalEventDelegablePresentation extends SingleVariableRenameProvider<CatchEventNode> {
+public class ConditionalEventDelegablePresentation extends SingleVariableRenameProvider<Delegable> {
 
     private static final String INTERNAL_STORAGE_HANDLER = "ru.runa.wfe.office.storage.handler.InternalStorageHandler";
 
     private final DelegableProvider expressionProvider;
     private final DelegableProvider storageProvider;
 
-    public ConditionalEventDelegablePresentation(CatchEventNode delegable) {
+    public ConditionalEventDelegablePresentation(Delegable delegable) {
         setElement(delegable);
         expressionProvider = HandlerRegistry.getProvider(GroovyBasedProvider.class.getName());
         storageProvider = HandlerRegistry.getProvider(INTERNAL_STORAGE_HANDLER);
@@ -39,22 +38,14 @@ public class ConditionalEventDelegablePresentation extends SingleVariableRenameP
         List<Change> changes = new ArrayList<>();
         ConditionalEventModel model = ConditionalEventModel.fromXml(element.getDelegationConfiguration());
 
-        boolean expressionChanged = expressionProvider.getUsedVariableNames(adaptForExpression(element, model)).contains(oldVariable.getName());
-        boolean storageChanged = storageProvider.getUsedVariableNames(adaptForStorage(element, model)).contains(oldVariable.getName());
+        boolean expressionChanged = expressionProvider.getUsedVariableNames(adaptToExpression(element, model)).contains(oldVariable.getName());
+        boolean storageChanged = storageProvider.getUsedVariableNames(adaptToExpression(element, model)).contains(oldVariable.getName());
 
         if (expressionChanged || storageChanged) {
             changes.add(new ConfigChange(oldVariable, newVariable, expressionChanged, storageChanged));
         }
 
         return changes;
-    }
-
-    private ConditionalEventExpressionDelegableAdapter adaptForExpression(Delegable delegable, ConditionalEventModel model) {
-        return new ConditionalEventExpressionDelegableAdapter((CatchEventNode) delegable, model);
-    }
-
-    private ConditionalEventStorageDelegableAdapter adaptForStorage(Delegable delegable, ConditionalEventModel model) {
-        return new ConditionalEventStorageDelegableAdapter((CatchEventNode) delegable, model);
     }
 
     private class ConfigChange extends TextCompareChange {
@@ -79,13 +70,13 @@ public class ConditionalEventDelegablePresentation extends SingleVariableRenameP
 
                 if (expressionChanged) {
                     String renamedExpressionXml = expressionProvider
-                            .getConfigurationOnVariableRename(adaptForExpression(element, model), currentVariable, replacementVariable);
+                            .getConfigurationOnVariableRename(adaptToExpression(element, model), currentVariable, replacementVariable);
                     model.setExpression(renamedExpressionXml);
                 }
 
                 if (storageChanged) {
                     String renamedStorageXml = storageProvider
-                            .getConfigurationOnVariableRename(adaptForStorage(element, model), currentVariable, replacementVariable);
+                            .getConfigurationOnVariableRename(adaptToStorage(element, model), currentVariable, replacementVariable);
                     model.setStorage(XmlUtil.parseWithoutValidation(renamedStorageXml).getRootElement());
                 }
 

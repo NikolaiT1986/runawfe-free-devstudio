@@ -20,7 +20,6 @@ import ru.runa.gpd.lang.model.ProcessDefinition;
 import ru.runa.gpd.lang.model.ProcessDefinitionAware;
 import ru.runa.gpd.lang.model.StorageAware;
 import ru.runa.gpd.lang.model.VariableContainer;
-import ru.runa.gpd.lang.model.bpmn.CatchEventNode;
 import ru.runa.gpd.ltk.ConditionalEventDelegablePresentation;
 import ru.runa.gpd.office.FilesSupplierMode;
 import ru.runa.gpd.office.Messages;
@@ -33,6 +32,8 @@ import ru.runa.gpd.ui.enhancement.ConditionalEventStorageDelegableAdapter;
 import ru.runa.gpd.ui.enhancement.DialogEnhancementMode;
 import ru.runa.gpd.util.XmlUtil;
 
+import static ru.runa.gpd.ui.enhancement.ConditionalEventDelegableAdapters.adaptToStorage;
+
 /**
  * Provider for conditional event storage configuration.
  * <p>
@@ -44,7 +45,7 @@ public class ConditionalEventInternalStorageOperationHandlerCellEditorProvider e
 
     @Override
     public String showConfigurationDialog(Delegable delegable, DialogEnhancementMode mode) {
-        ConditionalEventStorageDialog dialog = new ConditionalEventStorageDialog(adapt(delegable));
+        ConditionalEventStorageDialog dialog = new ConditionalEventStorageDialog(adaptToStorage(delegable));
         if (dialog.open() == Window.OK) {
             return dialog.getResult();
         }
@@ -53,12 +54,12 @@ public class ConditionalEventInternalStorageOperationHandlerCellEditorProvider e
 
     @Override
     public Object showEmbeddedConfigurationDialog(final Composite mainComposite, Delegable delegable, DialogEnhancementMode dialogEnhancementMode) {
-        return super.showEmbeddedConfigurationDialog(mainComposite, adapt(delegable), dialogEnhancementMode);
+        return super.showEmbeddedConfigurationDialog(mainComposite, adaptToStorage(delegable), dialogEnhancementMode);
     }
 
     @Override
     public void onDelete(Delegable delegable) {
-        super.onDelete(adapt(delegable));
+        super.onDelete(adaptToStorage(delegable));
     }
 
     /**
@@ -104,11 +105,7 @@ public class ConditionalEventInternalStorageOperationHandlerCellEditorProvider e
 
     @Override
     public boolean validateValue(Delegable delegable, List<ValidationError> errors) throws Exception {
-        return super.validateValue(adapt(delegable), errors);
-    }
-
-    protected ConditionalEventStorageDelegableAdapter adapt(Delegable delegable) {
-        return new ConditionalEventStorageDelegableAdapter((CatchEventNode) delegable);
+        return super.validateValue(adaptToStorage(delegable), errors);
     }
 
     protected class ConditionalEventConstructorView extends ConstructorView {
@@ -117,7 +114,7 @@ public class ConditionalEventInternalStorageOperationHandlerCellEditorProvider e
 
         public ConditionalEventConstructorView(Composite parent, Delegable delegable, InternalStorageDataModel model, VariableProvider variableProvider, boolean isUseExternalStorageIn, boolean isUseExternalStorageOut) {
             super(parent, delegable, model, variableProvider, isUseExternalStorageIn, isUseExternalStorageOut, new VariableUserTypeInfo(false, ""));
-            this.conditionalEventModel = ((ConditionalEventStorageDelegableAdapter) delegable).getModel();
+            this.conditionalEventModel = ((ConditionalEventStorageDelegableAdapter<?>) delegable).getModel();
         }
 
         @Override
@@ -166,9 +163,9 @@ public class ConditionalEventInternalStorageOperationHandlerCellEditorProvider e
          * which is invoked by {@link ConditionalEventStorageDialog#createDialogArea(Composite)}.
          * Expected to be a {@link ConditionalEventStorageDelegableAdapter}.
          */
-        public ConditionalEventStorageDialog(Delegable delegable) {
+        public ConditionalEventStorageDialog(ConditionalEventStorageDelegableAdapter<?> delegable) {
             super(delegable);
-            this.conditionalEventModel = ((ConditionalEventStorageDelegableAdapter) delegable).getModel();
+            this.conditionalEventModel = delegable.getModel();
         }
 
         @Override
