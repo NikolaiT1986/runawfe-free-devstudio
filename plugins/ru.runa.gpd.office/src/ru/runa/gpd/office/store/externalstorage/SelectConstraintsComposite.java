@@ -2,6 +2,7 @@ package ru.runa.gpd.office.store.externalstorage;
 
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 import org.eclipse.swt.widgets.Composite;
 import ru.runa.gpd.lang.model.Variable;
 import ru.runa.gpd.office.FilesSupplierMode;
@@ -37,11 +38,6 @@ public class SelectConstraintsComposite extends AbstractOperatingVariableComboBa
     }
 
     @Override
-    protected Predicate<? super Variable> getFilterPredicate(String variableTypeName) {
-        return variable -> variable.getFormatComponentClassNames()[0].equals(variableTypeName);
-    }
-
-    @Override
     public void build() {
         if (variableUserTypeInfo.isImmutable() || !mode.isOutSupported()) {
             return;
@@ -55,8 +51,17 @@ public class SelectConstraintsComposite extends AbstractOperatingVariableComboBa
     }
 
     @Override
-    protected String[] getTypeNameFilters() {
-        return new String[]{List.class.getName()};
+    protected Stream<String> variableNamesByVariableTypeName(String variableTypeName) {
+        Stream<String> listVariablesStream = variableProvider.getVariables(true, false, List.class.getName()).stream()
+                .filter(variable -> variable.getFormatComponentClassNames()[0].equals(variableTypeName))
+                .map(Variable::getName);
+        Stream<String> singleVariablesStream = variableProvider.getVariables(true, false, variableTypeName).stream().map(Variable::getName);
+        return Stream.concat(listVariablesStream, singleVariablesStream);
+    }
+
+    @Override
+    protected Predicate<? super Variable> getFilterPredicate(String variableTypeName) {
+        throw new UnsupportedOperationException("variableNamesByVariableTypeName is overriden here");
     }
 
     @Override
