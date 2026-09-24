@@ -22,6 +22,7 @@ import ru.runa.gpd.lang.ValidationError;
 import ru.runa.gpd.lang.model.ConditionalEventModel;
 import ru.runa.gpd.lang.model.Delegable;
 import ru.runa.gpd.lang.model.GraphElement;
+import ru.runa.gpd.lang.model.GraphElementAware;
 import ru.runa.gpd.lang.model.ProcessDefinition;
 import ru.runa.gpd.lang.model.ProcessDefinitionAware;
 import ru.runa.gpd.lang.model.StorageAware;
@@ -123,6 +124,13 @@ public class StartInternalStorageOperationHandlerCellEditorProvider extends Inte
     @Override
     public boolean validateValue(Delegable delegable, List<ValidationError> errors) throws Exception {
         return super.validateValue(adaptToStorage(delegable), errors);
+    }
+
+    @Override
+    protected boolean validateModel(Delegable delegable, InternalStorageDataModel model, List<ValidationError> errors) {
+        final GraphElement graphElement = ((GraphElementAware) delegable).getGraphElement();
+        model.validate(graphElement, errors);
+        return true;
     }
 
     protected class StartInternalStorageConstructorView extends ConstructorView {
