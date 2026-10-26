@@ -36,7 +36,7 @@ import ru.runa.gpd.office.store.externalstorage.InternalStorageDataModel;
 import ru.runa.gpd.office.store.externalstorage.PredicateCompositeDelegateBuilder;
 import ru.runa.gpd.office.store.externalstorage.ProcessDefinitionVariableProvider;
 import ru.runa.gpd.office.store.externalstorage.QueryRole;
-import ru.runa.gpd.office.store.externalstorage.SelectConstraintsComposite;
+import ru.runa.gpd.office.store.externalstorage.StartConditionalSelectConstraintsComposite;
 import ru.runa.gpd.office.store.externalstorage.SubQueryVariableProvider;
 import ru.runa.gpd.office.store.externalstorage.VariableProvider;
 import ru.runa.gpd.ui.control.IntervalControl;
@@ -230,7 +230,7 @@ public class StartInternalStorageOperationHandlerCellEditorProvider extends Inte
         private void initTriggerCompositeBuilder() {
             triggerConstraintsModel.setQueryType(QueryType.SELECT);
             triggerCompositeBuilder = new PredicateCompositeDelegateBuilder(this, SWT.NONE, triggerConstraintsModel, variableProvider,
-                    triggerVariableUserTypeInfo.getVariableTypeName(), new SelectConstraintsComposite(this, SWT.NONE, triggerConstraintsModel,
+                    triggerVariableUserTypeInfo.getVariableTypeName(), new StartConditionalSelectConstraintsComposite(this, SWT.NONE, triggerConstraintsModel,
                     variableProvider, triggerVariableUserTypeInfo, model));
         }
 
@@ -243,7 +243,7 @@ public class StartInternalStorageOperationHandlerCellEditorProvider extends Inte
             existsCompositeBuilder = new PredicateCompositeDelegateBuilder(
                     this, SWT.NONE, existsConstraintsModel, existsVariableProvider,
                     existsVariableUserTypeInfo.getVariableTypeName(),
-                    new SelectConstraintsComposite(
+                    new StartConditionalSelectConstraintsComposite(
                             this,
                             SWT.NONE,
                             existsConstraintsModel,
