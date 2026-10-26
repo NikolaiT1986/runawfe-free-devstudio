@@ -71,7 +71,9 @@ public class InternalStorageDataModel extends DataModel {
         final StorageConstraintsModel constraintsModel = Iterables.getOnlyElement(constraints);
         final VariableProvider variableProvider = new ProcessDefinitionVariableProvider(graphElement.getProcessDefinition());
 
-        validateConstraints(graphElement, constraintsModel, variableProvider, errors);
+        if (validateInOutModel(graphElement, constraintsModel, errors)) {
+            validateConstraints(graphElement, constraintsModel, variableProvider, errors);
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -91,20 +93,21 @@ public class InternalStorageDataModel extends DataModel {
                 mode.isOutSupported() ? document.getRootElement().element("output") : null);
     }
 
+    protected boolean validateInOutModel(GraphElement graphElement, StorageConstraintsModel constraintsModel, List<ValidationError> errors) {
+        if (constraintsModel.getQueryType() == QueryType.INSERT || constraintsModel.getQueryType() == QueryType.UPDATE) {
+            super.validate(graphElement, errors);
+            return errors.isEmpty();
+        } else {
+            inOutModel.validate(graphElement, mode, errors);
+            return true;
+        }
+    }
+
     protected void validateConstraints(
             GraphElement graphElement,
             StorageConstraintsModel constraintsModel,
             VariableProvider variableProvider,
             List<ValidationError> errors) {
-
-        if (constraintsModel.getQueryType() == QueryType.INSERT || constraintsModel.getQueryType() == QueryType.UPDATE) {
-            super.validate(graphElement, errors);
-            if (!errors.isEmpty()) {
-                return;
-            }
-        } else {
-            inOutModel.validate(graphElement, mode, errors);
-        }
 
         final String queryString = constraintsModel.getQueryString();
         if (queryString == null || queryString.trim().isEmpty()) {

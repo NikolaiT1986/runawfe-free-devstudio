@@ -30,7 +30,7 @@ import ru.runa.gpd.lang.model.VariableContainer;
 import ru.runa.gpd.lang.model.VariableUserType;
 import ru.runa.gpd.office.FilesSupplierMode;
 import ru.runa.gpd.office.Messages;
-import ru.runa.gpd.office.store.externalstorage.CompositeInternalStorageDataModel;
+import ru.runa.gpd.office.store.externalstorage.StartConditionalInternalStorageDataModel;
 import ru.runa.gpd.office.store.externalstorage.ConstraintsCompositeBuilder;
 import ru.runa.gpd.office.store.externalstorage.InternalStorageDataModel;
 import ru.runa.gpd.office.store.externalstorage.PredicateCompositeDelegateBuilder;
@@ -79,7 +79,7 @@ public class StartInternalStorageOperationHandlerCellEditorProvider extends Inte
 
     @Override
     protected InternalStorageDataModel createDefault() {
-        CompositeInternalStorageDataModel model = new CompositeInternalStorageDataModel(FilesSupplierMode.BOTH);
+        StartConditionalInternalStorageDataModel model = new StartConditionalInternalStorageDataModel(FilesSupplierMode.BOTH);
         model.constraints.add(new StorageConstraintsModel(StorageConstraintsModel.ATTR, QueryType.SELECT, QueryRole.TRIGGER));
         model.constraints.add(new StorageConstraintsModel(StorageConstraintsModel.ATTR, QueryType.SELECT, QueryRole.NOT_EXISTS));
         return model;
@@ -88,7 +88,7 @@ public class StartInternalStorageOperationHandlerCellEditorProvider extends Inte
 
     @Override
     protected InternalStorageDataModel fromXml(String xml) {
-        return CompositeInternalStorageDataModel.fromXml(xml);
+        return StartConditionalInternalStorageDataModel.fromXml(xml);
     }
 
 
@@ -218,7 +218,7 @@ public class StartInternalStorageOperationHandlerCellEditorProvider extends Inte
 
         @Override
         protected void initConstraintsModel() {
-            CompositeInternalStorageDataModel startModel = (CompositeInternalStorageDataModel) model;
+            StartConditionalInternalStorageDataModel startModel = (StartConditionalInternalStorageDataModel) model;
             if (constraintsModel == startModel.getTriggerConstraints()
                     && existsConstraintsModel == startModel.getExistsConstraints()) {
                 return;
@@ -249,7 +249,7 @@ public class StartInternalStorageOperationHandlerCellEditorProvider extends Inte
                             existsConstraintsModel,
                             existsVariableProvider,
                             existsVariableUserTypeInfo,
-                            ((CompositeInternalStorageDataModel) model).getExistsModel()
+                            ((StartConditionalInternalStorageDataModel) model).getExistsModel()
                     ));
         }
 

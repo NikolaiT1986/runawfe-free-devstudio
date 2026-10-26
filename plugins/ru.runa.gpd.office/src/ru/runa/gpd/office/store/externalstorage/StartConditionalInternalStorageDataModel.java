@@ -9,13 +9,13 @@ import ru.runa.gpd.office.FilesSupplierMode;
 import ru.runa.gpd.office.store.StorageConstraintsModel;
 import ru.runa.gpd.util.XmlUtil;
 
-public class CompositeInternalStorageDataModel extends InternalStorageDataModel {
+public class StartConditionalInternalStorageDataModel extends InternalStorageDataModel {
 
-    public CompositeInternalStorageDataModel(FilesSupplierMode mode) {
+    public StartConditionalInternalStorageDataModel(FilesSupplierMode mode) {
         super(mode);
     }
 
-    public CompositeInternalStorageDataModel(FilesSupplierMode mode, ExternalStorageHandlerInputOutputModel inOutModel) {
+    public StartConditionalInternalStorageDataModel(FilesSupplierMode mode, ExternalStorageHandlerInputOutputModel inOutModel) {
         super(mode, inOutModel);
     }
 
@@ -33,12 +33,12 @@ public class CompositeInternalStorageDataModel extends InternalStorageDataModel 
         return existsModel;
     }
 
-    public static CompositeInternalStorageDataModel fromXml(String xml) {
+    public static StartConditionalInternalStorageDataModel fromXml(String xml) {
         final Document document = XmlUtil.parseWithoutValidation(xml);
 
         final List<StorageConstraintsModel> constraints = deserializeConstraints(document, 2);
 
-        final CompositeInternalStorageDataModel model = new CompositeInternalStorageDataModel(
+        final StartConditionalInternalStorageDataModel model = new StartConditionalInternalStorageDataModel(
                 FilesSupplierMode.BOTH, deserializeInOutModel(document, FilesSupplierMode.BOTH)
         );
 
@@ -56,7 +56,9 @@ public class CompositeInternalStorageDataModel extends InternalStorageDataModel 
         final StorageConstraintsModel triggerConstraintsModel = getTriggerConstraints();
         final VariableProvider processVariableProvider = new ProcessDefinitionVariableProvider(graphElement.getProcessDefinition());
 
-        validateConstraints(graphElement, triggerConstraintsModel, processVariableProvider, errors);
+        if (validateInOutModel(graphElement, triggerConstraintsModel, errors)) {
+            validateConstraints(graphElement, triggerConstraintsModel, processVariableProvider, errors);
+        }
 
         final StorageConstraintsModel existsConstraintsModel = getExistsConstraints();
         final VariableUserType triggerUserType = processVariableProvider.getUserType(triggerConstraintsModel.getSheetName());
