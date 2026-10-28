@@ -1,7 +1,9 @@
 package ru.runa.gpd.office.store.externalstorage.predicate;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.StringTokenizer;
+import ru.runa.gpd.lang.model.DataFieldVariable;
 import ru.runa.gpd.lang.model.Variable;
 import ru.runa.gpd.lang.model.VariableUserType;
 import ru.runa.gpd.office.store.externalstorage.VariableProvider;
@@ -27,7 +29,7 @@ public class PredicateParser {
         int[] brackets = new int[2];
         boolean endExpressionLine = false;
 
-        while (st.hasMoreTokens()) {            
+        while (st.hasMoreTokens()) {
             String token = st.nextToken();
             token = trimBrackets(token, brackets);
             if (endExpressionLine) {
@@ -38,15 +40,12 @@ public class PredicateParser {
 
             if (token.startsWith("[") && token.endsWith("]")) {
                 token = token.replace(UNICODE_CHARACTER_OVERLINE, ' ');
-
                 String[] parts = token.split("\\.");
                 if (parts.length == 2) {
-                    final String userTypeTableFieldName = parts[0].substring(1, parts[0].length() - 1)
-                            + "."
-                            + parts[1].substring(1, parts[1].length() - 1);
-
-                    final Variable comparingWithVariable = variableProvider.variableByName(userTypeTableFieldName)
-                            .orElseThrow(() -> new VariableDoesNotExistException(userTypeTableFieldName));
+                    final String qualifiedUserTypeFieldName = parts[0].substring(1, parts[0].length() - 1)
+                            + "." + parts[1].substring(1, parts[1].length() - 1);
+                    final Variable comparingWithVariable = getDataFieldVariableByName(qualifiedUserTypeFieldName)
+                            .orElseThrow(() -> new VariableDoesNotExistException(qualifiedUserTypeFieldName));
 
                     if (result instanceof VariablePredicate) {
                         ((VariablePredicate) result).setRight(comparingWithVariable);
@@ -129,6 +128,12 @@ public class PredicateParser {
             }
         }
         return str;
+    }
+
+    private Optional<DataFieldVariable> getDataFieldVariableByName(String qualifiedName) {
+        return variableProvider.getVariables(false, false).stream()
+                .filter(DataFieldVariable.class::isInstance).map(DataFieldVariable.class::cast)
+                .filter(variable -> Objects.equals(variable.getName(), qualifiedName)).findAny();
     }
 
     private Optional<Variable> getUserTypeFieldByName(String name) {
