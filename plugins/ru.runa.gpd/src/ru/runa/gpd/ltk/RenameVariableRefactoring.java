@@ -163,7 +163,9 @@ public class RenameVariableRefactoring extends Refactoring {
             cachedChange = new CompositeChange(getName());
             for (VariableRenameProvider<?> classPresentation : cache) {
                 try {
-                    List<Change> changes = classPresentation.getChanges(variablesMap, userType);
+                    List<Change> changes = userType == null
+                            ? classPresentation.getChanges(variablesMap)
+                            : classPresentation.getChanges(variablesMap, userType);
                     cachedChange.addAll(changes.toArray(new Change[changes.size()]));
                 } catch (Exception e) {
                     PluginLogger.logErrorWithoutDialog("Unable to get used variables in " + classPresentation.element, e);

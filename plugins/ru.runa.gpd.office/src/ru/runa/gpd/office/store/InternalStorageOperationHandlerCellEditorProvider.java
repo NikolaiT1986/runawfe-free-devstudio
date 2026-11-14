@@ -50,6 +50,7 @@ import ru.runa.gpd.office.store.externalstorage.predicate.PredicateTree;
 import ru.runa.gpd.office.store.externalstorage.predicate.VariablePredicate;
 import ru.runa.gpd.ui.custom.SwtUtils;
 import ru.runa.gpd.util.EmbeddedFileUtils;
+import ru.runa.gpd.util.VariableUtils;
 import ru.runa.gpd.util.XmlUtil;
 
 public class InternalStorageOperationHandlerCellEditorProvider extends XmlBasedConstructorProvider<InternalStorageDataModel> {
@@ -222,8 +223,8 @@ public class InternalStorageOperationHandlerCellEditorProvider extends XmlBasedC
         String currentAttributeName = null;
         String previewAttributeName = null;
         if (userType != null) {
-            currentAttributeName = getUserTypeAttributeName(currentVariable);
-            previewAttributeName = getUserTypeAttributeName(previewVariable);
+            currentAttributeName = VariableUtils.getUserTypeAttributeName(currentVariable);
+            previewAttributeName = VariableUtils.getUserTypeAttributeName(previewVariable);
         }
 
         for (StorageConstraintsModel constraintsModel : model.constraints) {
@@ -296,6 +297,44 @@ public class InternalStorageOperationHandlerCellEditorProvider extends XmlBasedC
         return model.toString();
     }
 
+    @Override
+    public List<String> getUsedUserTypeAttributeNames(Delegable delegable, VariableUserType userType) {
+        String configuration = delegable.getDelegationConfiguration();
+        if (Strings.isNullOrEmpty(configuration)) {
+            return Lists.newArrayList();
+        }
+
+        InternalStorageDataModel model = InternalStorageDataModel.fromXml(configuration);
+        Set<String> usedAttributeNames = new LinkedHashSet<>();
+
+        List<String> attributeNames = userType.getAttributes().stream()
+                .map(Variable::getName).collect(Collectors.toList());
+
+        for (StorageConstraintsModel constraintsModel : model.constraints) {
+            if (!Objects.equal(constraintsModel.getSheetName(), userType.getName())) {
+                continue;
+            }
+
+            PredicateTree predicateTree = parsePredicate(constraintsModel);
+            if (predicateTree == null) {
+                continue;
+            }
+
+            for (ConstraintsPredicate<?, ?> predicate : predicateTree) {
+                if (!(predicate instanceof VariablePredicate)) {
+                    continue;
+                }
+
+                Variable left = ((VariablePredicate) predicate).getLeft();
+                if (left != null && attributeNames.contains(left.getName())) {
+                    usedAttributeNames.add(left.getName());
+                }
+            }
+        }
+
+        return new ArrayList<>(usedAttributeNames);
+    }
+
     protected boolean containsVariableByName(List<Variable> variables, String variableName) {
         return variableName != null && variables.stream().anyMatch(variable -> Objects.equal(variable.getName(), variableName));
     }
@@ -310,15 +349,6 @@ public class InternalStorageOperationHandlerCellEditorProvider extends XmlBasedC
         PredicateTree predicateTree = new PredicateTree();
         predicateTree.setHead(predicateParser.parse());
         return predicateTree;
-    }
-
-    protected String getUserTypeAttributeName(Variable variable) {
-        String name = variable.getName();
-        int delimiterIndex = name.lastIndexOf(VariableUserType.DELIM);
-        if (delimiterIndex < 0) {
-            return "";
-        }
-        return name.substring(delimiterIndex + VariableUserType.DELIM.length());
     }
 
     private class ConstructorView extends ConstructorComposite {

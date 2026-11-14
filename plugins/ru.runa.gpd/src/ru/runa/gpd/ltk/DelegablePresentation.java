@@ -11,6 +11,7 @@ import ru.runa.gpd.extension.HandlerRegistry;
 import ru.runa.gpd.lang.model.Delegable;
 import ru.runa.gpd.lang.model.Variable;
 import ru.runa.gpd.lang.model.VariableUserType;
+import ru.runa.gpd.util.VariableUtils;
 
 public class DelegablePresentation extends SingleVariableRenameProvider<Delegable> {
     private final DelegableProvider provider;
@@ -32,7 +33,9 @@ public class DelegablePresentation extends SingleVariableRenameProvider<Delegabl
     @Override
     protected List<Change> getChanges(Variable oldVariable, Variable newVariable, VariableUserType userType) throws Exception {
         List<Change> changes = new ArrayList<>();
-        if ((provider.getUsedVariableNames(element).contains(oldVariable.getName()))) {
+        if (provider.getUsedVariableNames(element).contains(oldVariable.getName())
+                || (userType != null && provider.getUsedUserTypeAttributeNames(element, userType)
+                .contains(VariableUtils.getUserTypeAttributeName(oldVariable)))) {
             changes.add(new ConfigChange(oldVariable, newVariable, userType));
         }
         return changes;

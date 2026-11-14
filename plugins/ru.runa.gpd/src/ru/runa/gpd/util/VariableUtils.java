@@ -171,6 +171,15 @@ public class VariableUtils {
         return null;
     }
 
+    public static String getUserTypeAttributeName(Variable variable) {
+        String name = variable.getName();
+        int delimiterIndex = name.lastIndexOf(VariableUserType.DELIM);
+        if (delimiterIndex < 0) {
+            return "";
+        }
+        return name.substring(delimiterIndex + VariableUserType.DELIM.length());
+    }
+
     public static String wrapVariableName(String variableName) {
         return "${" + variableName + "}";
     }

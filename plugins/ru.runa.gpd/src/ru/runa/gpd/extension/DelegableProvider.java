@@ -124,6 +124,10 @@ public class DelegableProvider {
         return delegable.getDelegationConfiguration();
     }
 
+    public List<String> getUsedUserTypeAttributeNames(Delegable delegable, VariableUserType userType) throws Exception {
+        return Lists.newArrayList();
+    }
+
     protected List<String> findUsedNames(String configuration, List<String> names) {
         if (Strings.isNullOrEmpty(configuration)) {
             return Lists.newArrayList();
