@@ -34,9 +34,9 @@ public class DelegablePresentation extends SingleVariableRenameProvider<Delegabl
     protected List<Change> getChanges(Variable oldVariable, Variable newVariable, VariableUserType userType) throws Exception {
         List<Change> changes = new ArrayList<>();
         if (provider.getUsedVariableNames(element).contains(oldVariable.getName())
-                || (userType != null && provider.getUsedUserTypeAttributeNames(element, userType)
-                .contains(VariableUtils.getUserTypeAttributeName(oldVariable)))) {
-            changes.add(new ConfigChange(oldVariable, newVariable, userType));
+                || provider.getUsedUserTypeAttributeNames(element, userType)
+                .contains(VariableUtils.getUserTypeAttributeName(oldVariable))) {
+            changes.add(new UserTypeAttributeConfigChange(oldVariable, newVariable, userType));
         }
         return changes;
     }
@@ -52,15 +52,8 @@ public class DelegablePresentation extends SingleVariableRenameProvider<Delegabl
 
     private class ConfigChange extends TextCompareChange<Variable> {
 
-        private final VariableUserType userType;
-
         public ConfigChange(Variable currentVariable, Variable replacementVariable) {
-            this(currentVariable, replacementVariable, null);
-        }
-
-        public ConfigChange(Variable currentVariable, Variable replacementVariable, VariableUserType userType) {
             super(element, currentVariable, replacementVariable);
-            this.userType = userType;
         }
 
         @Override
@@ -69,11 +62,9 @@ public class DelegablePresentation extends SingleVariableRenameProvider<Delegabl
             element.setDelegationConfiguration(newConfiguration);
         }
 
-        private String getConfigurationReplacement() {
+        protected String getConfigurationReplacement() {
             try {
-                return userType == null
-                        ? provider.getConfigurationOnVariableRename(element, currentObject, replacementObject)
-                        : provider.getConfigurationOnVariableRename(element, currentObject, replacementObject, userType);
+                return provider.getConfigurationOnVariableRename(element, currentObject, replacementObject);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -92,6 +83,27 @@ public class DelegablePresentation extends SingleVariableRenameProvider<Delegabl
         @Override
         protected String toPreviewContent(Variable variable) {
             throw new UnsupportedOperationException();
+        }
+    }
+
+    private class UserTypeAttributeConfigChange extends ConfigChange {
+
+        private final VariableUserType userType;
+
+        public UserTypeAttributeConfigChange(Variable currentVariable, Variable replacementVariable,
+                VariableUserType userType) {
+            super(currentVariable, replacementVariable);
+            this.userType = userType;
+        }
+
+        @Override
+        protected String getConfigurationReplacement() {
+            try {
+                return provider.getConfigurationOnVariableRename(element, currentObject, replacementObject, userType);
+            } catch (Exception e) {
+                PluginLogger.logErrorWithoutDialog(this.getClass().getName(), e);
+                return element.getDelegationConfiguration();
+            }
         }
     }
 

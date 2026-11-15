@@ -184,8 +184,8 @@ public class InternalStorageOperationHandlerCellEditorProvider extends XmlBasedC
                 }
                 Variable right = ((VariablePredicate) predicate).getRight();
                 if (right != null) {
-                    processVariables.stream().filter(variable -> Objects.equal(variable.getScriptingName(), right.getScriptingName())).findFirst()
-                            .ifPresent(variable -> usedVariableNames.add(variable.getName()));
+                    processVariables.stream().filter(variable -> Objects.equal(variable.getScriptingName(), right.getScriptingName()))
+                            .findFirst().ifPresent(variable -> usedVariableNames.add(variable.getName()));
                 }
             }
         }
